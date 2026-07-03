@@ -1,0 +1,95 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+html,
+body,
+#root {
+	height: 100%;
+	width: 100%;
+	margin: 0;
+	padding: 0;
+	font-family: "Inter", sans-serif;
+}
+
+body {
+	background:
+		linear-gradient(
+			135deg,
+			rgba(15, 23, 42, 0.95),
+			rgba(30, 41, 59, 0.92),
+			rgba(15, 23, 42, 0.95)
+		),
+		url("/office-bg.jpg");
+
+	background-size: cover;
+	background-position: center;
+	background-repeat: no-repeat;
+	background-attachment: fixed;
+	color: white;
+}
+
+/* Smooth scrolling */
+html {
+	scroll-behavior: smooth;
+}
+
+/* Scrollbar */
+::-webkit-scrollbar {
+	width: 8px;
+}
+
+::-webkit-scrollbar-track {
+	background: rgba(255,255,255,0.05);
+}
+
+::-webkit-scrollbar-thumb {
+	background: rgba(255,255,255,0.18);
+	border-radius: 100px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+	background: rgba(255,255,255,0.35);
+}
+
+/* Glass Effect */
+.glass {
+	background: rgba(255,255,255,0.05);
+	backdrop-filter: blur(18px);
+	-webkit-backdrop-filter: blur(18px);
+	border: 1px solid rgba(255,255,255,0.08);
+}
+
+/* Animations */
+
+* {
+	transition: all .25s ease;
+}
+
+.shake {
+	animation: shake .8s;
+}
+
+@keyframes shake {
+
+	10%,
+	90% {
+		transform: translateX(-2px);
+	}
+
+	20%,
+	80% {
+		transform: translateX(4px);
+	}
+
+	30%,
+	50%,
+	70% {
+		transform: translateX(-6px);
+	}
+
+	40%,
+	60% {
+		transform: translateX(6px);
+	}
+}
