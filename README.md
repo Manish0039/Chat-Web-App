@@ -12,7 +12,8 @@ ChatSphere is a full-stack, real-time messaging web application engineered with 
 
 <p align="center">
   <img src="./frontend/src/assets/preview/signup.png" width="48%" alt="Signup Interface" />
-  <img src="./frontend/src/assets/preview/chat.png" width="48%" alt="Active Chat Room" />
+  <img src="./frontend/src/assets/preview/chat.png" width="48%" alt="Home page" />
+  
 </p>
 
 ---
