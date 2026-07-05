@@ -13,12 +13,19 @@ import { app, server } from "./socket/socket.js";
 
 // ... other imports
 
+// ... upper imports stay the same
+
 app.use(cors({
-    origin: "https://chat-web-app-three-livid.vercel.app", // 👈 Absolute exact match of your live Vercel frontend
+    origin: [
+        "https://chat-web-app-three-livid.vercel.app",
+        "https://chat-web-app-manish40.vercel.app" // 👈 Added your active production URL here
+    ],
     credentials: true,
     methods: ["GET", "POST", "PUT", "DELETE"],
     allowedHeaders: ["Content-Type", "Authorization"]
 }));
+
+// ... rest of the file stays the same
 
 const PORT = process.env.PORT || 5000;
 
