@@ -2,81 +2,73 @@ import bcrypt from "bcryptjs";
 import User from "../models/user.model.js";
 import generateTokenAndSetCookie from "../utils/generateToken.js";
 
+// A dummy hash generated once on server startup to fight timing attacks
+const DUMMY_HASH = "$2a$10$Nxw1tXv70p8/TymH.eB.6O8gA4uA5v6W7gA4uA5v6W7gA4uA5v6W7";
+
 export const signup = async (req, res) => {
     try {
-        // 1. Destructure all possible frontend naming patterns safely
         const { 
-            fullname, 
-            fullName, 
-            username, 
-            email, 
+            fullname, fullName, 
+            username, email, 
             password, 
-            confpassword, 
-            confirmPassword, 
+            confpassword, confirmPassword, 
             gender 
         } = req.body;
 
-        // 2. Fallback assignment (handles camelCase vs lowercase property keys)
         const finalFullName = fullname || fullName;
         const finalConfirmPassword = confpassword || confirmPassword;
         const finalGender = gender || "male";
 
-        // 3. Validation Checks
         if (!finalFullName || !username || !password || !finalConfirmPassword) {
             return res.status(400).json({ error: "Please fill in all required fields" });
         }
 
-        // 4. Match comparison with space trimming safety built-in
         if (password.trim() !== finalConfirmPassword.trim()) {
             return res.status(400).json({ error: "Passwords don't match" });
         }
 
-		// FIXED: Correct live API endpoint format for placeholders
-
-        // 5. Check if user already exists
         const userExists = await User.findOne({ username });
         if (userExists) {
             return res.status(400).json({ error: "Username already exists" });
         }
 
-        // 6. Hash password
         const salt = await bcrypt.genSalt(10);
         const hashedPassword = await bcrypt.hash(password, salt);
 
-        // 7. Setup profile picture placeholders
-		// FIXED: Correct live API endpoint format for placeholders
-const boyProfilePic = `https://avatar.iran.liara.run/username?username=${username}&gender=male`;
-const girlProfilePic = `https://avatar.iran.liara.run/username?username=${username}&gender=female`;
+        const boyProfilePic = `https://avatar.iran.liara.run/username?username=${username}&gender=male`;
+        const girlProfilePic = `https://avatar.iran.liara.run/username?username=${username}&gender=female`;
       
-
-        // 8. Construct new database document instance
         const newUser = new User({
             fullName: finalFullName,
             username,
-            email: email || "", // Saves email if passed, falls back to empty string if missing from schema
+            email: email || "", 
             password: hashedPassword,
             gender: finalGender,
             profilePic: finalGender.toLowerCase() === "female" ? girlProfilePic : boyProfilePic,
         });
 
-        if (newUser) {
-            // Generate JWT token and set HTTP-only cookie
-            generateTokenAndSetCookie(newUser._id, res);
-            await newUser.save();
+        // Save first to verify MongoDB accepted the document successfully
+        await newUser.save();
 
-            return res.status(201).json({
-                _id: newUser._id,
-                fullName: newUser.fullName,
-                username: newUser.username,
-                profilePic: newUser.profilePic,
-            });
-        } else {
-            return res.status(400).json({ error: "Invalid user data structure" });
-        }
-    } catch (error) {
-        console.error("Critical error inside signup controller:", error.message);
-        return res.status(500).json({ error: "Internal Server Error" });
-    }
+        generateTokenAndSetCookie(newUser._id, res);
+
+        return res.status(201).json({
+            _id: newUser._id,
+            fullName: newUser.fullName,
+            username: newUser.username,
+            profilePic: newUser.profilePic,
+        });
+        
+   } catch (error) {
+    console.error("================ ERROR ================");
+    console.error(error);
+    console.error("=======================================");
+
+    return res.status(500).json({
+        error: error.message,
+        stack: error.stack,
+    });
+}
 };
 
 export const login = async (req, res) => {
@@ -88,8 +80,13 @@ export const login = async (req, res) => {
         }
 
         const user = await User.findOne({ username });
-        const isPasswordCorrect = await bcrypt.compare(password, user?.password || "");
+        
+        // If user doesn't exist, we compare against the DUMMY_HASH. 
+        // This takes the exact same processing time, rendering timing attacks useless.
+        const hashToCompare = user ? user.password : DUMMY_HASH;
+        const isPasswordCorrect = await bcrypt.compare(password, hashToCompare);
 
+        // Generic error message keeps our application secure
         if (!user || !isPasswordCorrect) {
             return res.status(400).json({ error: "Invalid username or password" });
         }
@@ -103,14 +100,26 @@ export const login = async (req, res) => {
             profilePic: user.profilePic,
         });
     } catch (error) {
-        console.error("Critical error inside login controller:", error.message);
-        return res.status(500).json({ error: "Internal Server Error" });
-    }
+    console.error("================ ERROR ================");
+    console.error(error);
+    console.error("=======================================");
+
+    return res.status(500).json({
+        error: error.message,
+        stack: error.stack,
+    });
+}
 };
 
 export const logout = (req, res) => {
     try {
-        res.cookie("jwt", "", { maxAge: 0 });
+        // secure: true and sameSite options ensure modern browsers handle clear correctly
+        res.cookie("jwt", "", { 
+            maxAge: 0,
+            httpOnly: true,
+            secure: process.env.NODE_ENV === "production",
+            sameSite: "strict"
+        });
         return res.status(200).json({ message: "Logged out successfully" });
     } catch (error) {
         console.error("Critical error inside logout controller:", error.message);

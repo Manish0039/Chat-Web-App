@@ -7,13 +7,14 @@ import { AuthContextProvider } from "./context/AuthContext.jsx";
 import { SocketContextProvider } from "./context/SocketContext.jsx";
 
 ReactDOM.createRoot(document.getElementById("root")).render(
-	<React.StrictMode>
-		<BrowserRouter>
-			<AuthContextProvider>
-				<SocketContextProvider>
-					<App />
-				</SocketContextProvider>
-			</AuthContextProvider>
-		</BrowserRouter>
-	</React.StrictMode>
+    <React.StrictMode>
+        {/* Added the future flags here to mute the console warnings */}
+        <BrowserRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
+            <AuthContextProvider>
+                <SocketContextProvider>
+                    <App />
+                </SocketContextProvider>
+            </AuthContextProvider>
+        </BrowserRouter>
+    </React.StrictMode>
 );

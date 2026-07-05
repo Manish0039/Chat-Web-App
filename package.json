@@ -3,12 +3,12 @@
   "version": "1.0.0",
   "description": "A real-time chat application built with the MERN Stack, Socket.IO, JWT authentication, and MongoDB.",
   "main": "backend/server.js",
+  "type": "module",
   "scripts": {
-    "server": "nodemon backend/server.js",
-    "start": "node backend/server.js",
+    "server": "nodemon --env-file=.env backend/server.js",
+    "start": "node --env-file=.env backend/server.js",
     "build": "npm install && npm install --prefix frontend && npm run build --prefix frontend"
   },
-  "type": "module",
   "keywords": [
     "mern",
     "react",
@@ -23,9 +23,10 @@
   "dependencies": {
     "bcryptjs": "^2.4.3",
     "cookie-parser": "^1.4.6",
-    "dotenv": "^16.4.1",
+    "dotenv": "^16.6.1",
     "express": "^4.18.2",
     "jsonwebtoken": "^9.0.2",
+    "mongodb": "^7.4.0",
     "mongoose": "^8.1.1",
     "react-icons": "^5.7.0",
     "socket.io": "^4.7.4"

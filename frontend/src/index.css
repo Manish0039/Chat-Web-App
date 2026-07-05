@@ -62,10 +62,11 @@ html {
 
 /* Animations */
 
-* {
+button,
+input,
+a {
 	transition: all .25s ease;
 }
-
 .shake {
 	animation: shake .8s;
 }

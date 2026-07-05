@@ -1,8 +1,3 @@
-import dotenv from "dotenv";
-// FIXED: Initialize dotenv configuration before importing files that rely on process.env
-dotenv.config(); 
-
-import path from "path";
 import express from "express";
 import cookieParser from "cookie-parser";
 
@@ -11,25 +6,21 @@ import messageRoutes from "./routes/message.routes.js";
 import userRoutes from "./routes/user.routes.js";
 
 import connectToMongoDB from "./db/connectToMongoDB.js";
-import { app, server } from "./socket/socket.js";
+import { app, server } from "./socket/socket.js"; // 👈 This line imports both app and server!
 
-const __dirname = path.resolve();
 const PORT = process.env.PORT || 5000;
 
-app.use(express.json()); // to parse the incoming requests with JSON payloads (from req.body)
+// Middleware
+app.use(express.json()); 
 app.use(cookieParser());
 
+// Routes
 app.use("/api/auth", authRoutes);
 app.use("/api/messages", messageRoutes);
 app.use("/api/users", userRoutes);
 
-app.use(express.static(path.join(__dirname, "/frontend/dist")));
-
-app.get("*", (req, res) => {
-    res.sendFile(path.join(__dirname, "frontend", "dist", "index.html"));
-});
-
+// 🚨 CRUCIAL: Change app.listen to server.listen so Socket.io works!
 server.listen(PORT, () => {
     connectToMongoDB();
-    console.log(`Server Running on port ${PORT}`);
+    console.log(`🚀 Server running on port ${PORT}`);
 });

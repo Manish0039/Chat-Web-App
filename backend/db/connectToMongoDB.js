@@ -1,14 +1,15 @@
 import mongoose from "mongoose";
 
-const dbConnect = async () => {
+const connectToMongoDB = async () => {
   try {
-    // Hardcode your local connection string directly to test it
-    const conn = await mongoose.connect("mongodb://localhost:27017/chatApp");
-    console.log(`MongoDB Connected: ${conn.connection.host}`);
+    const conn = await mongoose.connect(process.env.MONGO_URI);
+
+    console.log(`✅ MongoDB Connected: ${conn.connection.host}`);
+    console.log(`📂 Database: ${conn.connection.name}`);
   } catch (error) {
-    console.error(`Error connecting to MongoDB: ${error.message}`);
+    console.error("❌ MongoDB Connection Error:", error);
     process.exit(1);
   }
 };
 
-export default dbConnect;
+export default connectToMongoDB;
