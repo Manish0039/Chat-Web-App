@@ -11,8 +11,8 @@ ChatSphere is a full-stack, real-time messaging web application engineered with 
 ## 📸 Application Previews
 
 <p align="center">
-  <img src="./assets/preview/signup.png" width="48%" alt="Signup Interface" />
-  <img src="./assets/preview/chat.png" width="48%" alt="Active Chat Room" />
+  <img src="./frontend/src/assets/preview/signup.png" width="48%" alt="Signup Interface" />
+  <img src="./frontend/src/assets/preview/chat.png" width="48%" alt="Active Chat Room" />
 </p>
 
 ---
@@ -51,6 +51,6 @@ Before executing the development runtimes, create a `.env` file inside your `/ba
 
 ```env
 PORT=5000
-MONGO_DB_URI=mongodb://127.0.0.1:27017/chat_sphere_db
+MONGO_DB_URI=your_mongodb_connection
 JWT_SECRET=your_custom_jwt_secret_phrase
 NODE_ENV=development
