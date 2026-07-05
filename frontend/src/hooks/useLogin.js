@@ -1,7 +1,7 @@
 import { useState } from "react";
 import toast from "react-hot-toast";
 import { useAuthContext } from "../context/AuthContext";
-import { API_BASE_URL } from "../../utils/api"; // 👈 1. Added this import (Make sure the path matches your folders)
+import { API_BASE_URL } from "../utils/api";
 
 const useLogin = () => {
     const [loading, setLoading] = useState(false);
