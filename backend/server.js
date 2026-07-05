@@ -10,9 +10,12 @@ import connectToMongoDB from "./db/connectToMongoDB.js";
 import { app, server } from "./socket/socket.js"; 
 
 // 🔴 FIXED: Removed trailing slash from the Vercel URL string
+
+// ... other imports
+
 app.use(cors({
-    origin: "https://chat-web-app-three-livid.vercel.app", 
-    credentials: true, 
+    origin: "https://chat-web-app-three-livid.vercel.app", // 👈 Absolute exact match of your live Vercel frontend
+    credentials: true,
     methods: ["GET", "POST", "PUT", "DELETE"],
     allowedHeaders: ["Content-Type", "Authorization"]
 }));
