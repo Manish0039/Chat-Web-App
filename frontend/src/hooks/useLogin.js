@@ -12,9 +12,10 @@ const useLogin = () => {
         if (!success) return;
         setLoading(true);
         try {
-            // 👈 2. Updated this line to use backticks `` and include ${API_BASE_URL}
             const res = await fetch(`${API_BASE_URL}/api/auth/login`, {
                 method: "POST",
+                // 🌟 FIXED: Added credentials field so the browser captures the cookie
+                credentials: "include", 
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ username, password }),
             });

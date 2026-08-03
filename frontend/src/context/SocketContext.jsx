@@ -1,49 +1,56 @@
-import { createContext, useState, useEffect, useContext } from "react";
+import { createContext, useContext, useEffect, useState } from "react";
+import { io } from "socket.io-client";
 import { useAuthContext } from "./AuthContext";
-import io from "socket.io-client";
 
 const SocketContext = createContext();
 
 export const useSocketContext = () => {
-    return useContext(SocketContext);
+  return useContext(SocketContext);
 };
 
 export const SocketContextProvider = ({ children }) => {
-    const [socket, setSocket] = useState(null);
-    const [onlineUsers, setOnlineUsers] = useState([]);
-    const { authUser } = useAuthContext();
+  const [socket, setSocket] = useState(null);
+  const [onlineUsers, setOnlineUsers] = useState([]);
 
-    useEffect(() => {
-        if (authUser) {
-            // FIXED: Placed the dynamic URL selection cleanly inside the useEffect hook
-            const socketUrl = process.env.NODE_ENV === "production" 
-                ? "https://MERN-CHAT-APP.onrender.com" 
-                : "http://localhost:5000";
+  const { authUser } = useAuthContext();
 
-            const newSocket = io(socketUrl, {
-                query: {
-                    userId: authUser._id,
-                },
-            });
+  useEffect(() => {
+    if (!authUser) {
+      if (socket) {
+        socket.disconnect();
+      }
 
-            setSocket(newSocket);
+      setSocket(null);
+      return;
+    }
 
-            newSocket.on("getOnlineUsers", (users) => {
-                setOnlineUsers(users);
-            });
+    const newSocket = io(import.meta.env.VITE_API_URL, {
+      withCredentials: true,
+      query: {
+        userId: authUser._id,
+      },
+      transports: ["websocket", "polling"],
+    });
 
-            return () => newSocket.close();
-        } else {
-            if (socket) {
-                socket.close();
-                setSocket(null);
-            }
-        }
-    }, [authUser]);
+    setSocket(newSocket);
 
-    return (
-        <SocketContext.Provider value={{ socket, onlineUsers }}>
-            {children}
-        </SocketContext.Provider>
-    );
+    newSocket.on("getOnlineUsers", (users) => {
+      setOnlineUsers(users);
+    });
+
+    return () => {
+      newSocket.disconnect();
+    };
+  }, [authUser]);
+
+  return (
+    <SocketContext.Provider
+      value={{
+        socket,
+        onlineUsers,
+      }}
+    >
+      {children}
+    </SocketContext.Provider>
+  );
 };
