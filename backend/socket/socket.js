@@ -6,27 +6,44 @@ const app = express();
 
 const server = http.createServer(app);
 
+// ==========================
+// Allowed Origins
+// ==========================
 const allowedOrigins = [
-  "http://localhost:5173",
   "http://localhost:3000",
+  "http://localhost:5173",
+
+  // Your Vercel Frontends
   "https://chat-web-app-three-livid.vercel.app",
   "https://chat-web-app-manish40.vercel.app",
 ];
 
 const io = new Server(server, {
   cors: {
-    origin: allowedOrigins,
-    credentials: true,
+    origin: [
+      "http://localhost:3000",
+      "http://localhost:5173",
+      "https://chat-web-app-xi-ten.vercel.app",
+      "https://chat-web-app-manish40.vercel.app",
+      "https://chat-web-app-three-livid.vercel.app",
+    ],
     methods: ["GET", "POST"],
+    credentials: true,
   },
 });
 
 const userSocketMap = {};
 
+// ==========================
+// Get Receiver Socket
+// ==========================
 export const getReceiverSocketId = (receiverId) => {
   return userSocketMap[receiverId];
 };
 
+// ==========================
+// Socket Connection
+// ==========================
 io.on("connection", (socket) => {
   console.log("✅ User Connected:", socket.id);
 

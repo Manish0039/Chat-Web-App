@@ -4,45 +4,54 @@ import { useAuthContext } from "../context/AuthContext";
 import { API_BASE_URL } from "../utils/api";
 
 const useLogin = () => {
-    const [loading, setLoading] = useState(false);
-    const { setAuthUser } = useAuthContext();
+  const [loading, setLoading] = useState(false);
+  const { setAuthUser } = useAuthContext();
 
-    const login = async (username, password) => {
-        const success = handleInputErrors(username, password);
-        if (!success) return;
-        setLoading(true);
-        try {
-            const res = await fetch(`${API_BASE_URL}/api/auth/login`, {
-                method: "POST",
-                // 🌟 FIXED: Added credentials field so the browser captures the cookie
-                credentials: "include", 
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ username, password }),
-            });
+  const login = async (username, password) => {
+    const success = handleInputErrors(username, password);
 
-            const data = await res.json();
-            if (data.error) {
-                throw new Error(data.error);
-            }
+    if (!success) return;
 
-            localStorage.setItem("chat-user", JSON.stringify(data));
-            setAuthUser(data);
-        } catch (error) {
-            toast.error(error.message);
-        } finally {
-            setLoading(false);
-        }
-    };
+    setLoading(true);
 
-    return { loading, login };
+    try {
+      const res = await fetch(`${API_BASE_URL}/api/auth/login`, {
+        method: "POST",
+        credentials: "include",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          username,
+          password,
+        }),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        throw new Error(data.error || "Login failed");
+      }
+
+      localStorage.setItem("chat-user", JSON.stringify(data));
+      setAuthUser(data);
+    } catch (error) {
+      toast.error(error.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return { loading, login };
 };
+
 export default useLogin;
 
 function handleInputErrors(username, password) {
-    if (!username || !password) {
-        toast.error("Please fill in all fields");
-        return false;
-    }
+  if (!username || !password) {
+    toast.error("Please fill in all fields");
+    return false;
+  }
 
-    return true;
+  return true;
 }

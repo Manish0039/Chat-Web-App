@@ -9,10 +9,10 @@ export const useSocketContext = () => {
 };
 
 export const SocketContextProvider = ({ children }) => {
+  const { authUser } = useAuthContext();
+
   const [socket, setSocket] = useState(null);
   const [onlineUsers, setOnlineUsers] = useState([]);
-
-  const { authUser } = useAuthContext();
 
   useEffect(() => {
     if (!authUser) {
@@ -21,21 +21,26 @@ export const SocketContextProvider = ({ children }) => {
       }
 
       setSocket(null);
+      setOnlineUsers([]);
       return;
     }
 
     const newSocket = io(import.meta.env.VITE_API_URL, {
       withCredentials: true,
+      transports: ["websocket", "polling"],
       query: {
         userId: authUser._id,
       },
-      transports: ["websocket", "polling"],
     });
 
     setSocket(newSocket);
 
     newSocket.on("getOnlineUsers", (users) => {
       setOnlineUsers(users);
+    });
+
+    newSocket.on("connect_error", (err) => {
+      console.error("Socket Connection Error:", err.message);
     });
 
     return () => {
